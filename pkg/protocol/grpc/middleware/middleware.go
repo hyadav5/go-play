@@ -65,26 +65,36 @@ func UnaryServerGrpcCtxTagsInterceptor() grpc.UnaryServerInterceptor {
 
 func UnaryServerAuthNInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		log.Println("Authenticated")
+		// Authentication logic
+		var authenticated = true
 		var err error
-		//return nil, err
+		if !authenticated { // Authentication failed
+			return nil, err
+		}
+		println("authN")
+		// Authentication success
+		resp, err := handler(ctx, req)
+		return resp, err
+	}
+}
+
+func UnaryServerAuthZInterceptor() grpc.UnaryServerInterceptor {
+	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+		// Authentication logic
+		var authorized = false
+		var err error
+		if !authorized { // Authentication failed
+			println("authZ failed")
+			return nil, err
+		}
+		println("authZ")
+		// Authentication success
 		resp, err := handler(ctx, req)
 		return resp, err
 	}
 }
 
 func UnaryServerLoggingInterceptor(logger *zap.Logger) grpc.UnaryServerInterceptor {
-	// Shared options for the logger, with a custom gRPC code to log level function.
-	o := []grpc_zap.Option{
-		grpc_zap.WithLevels(codeToLevel),
-	}
-	// Make sure that log statements internal to gRPC library are logged using the zapLogger as well.
-	grpc_zap.ReplaceGrpcLoggerV2(logger)
-
-	return grpc_zap.UnaryServerInterceptor(logger, o...)
-}
-
-func UnaryServerInterceptor(logger *zap.Logger) grpc.UnaryServerInterceptor {
 	// Shared options for the logger, with a custom gRPC code to log level function.
 	o := []grpc_zap.Option{
 		grpc_zap.WithLevels(codeToLevel),

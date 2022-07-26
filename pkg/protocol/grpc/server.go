@@ -39,9 +39,10 @@ func RunServer(ctx context.Context, v1API v1.ToDoServiceServer, port string) err
 
 	if authEnabled {
 		unaryInterceptors = append(unaryInterceptors, middleware.UnaryServerAuthNInterceptor())
+		unaryInterceptors = append(unaryInterceptors, middleware.UnaryServerAuthZInterceptor())
 	}
 	if middlewareLogging {
-		unaryInterceptors = append(unaryInterceptors, middleware.UnaryServerInterceptor(logger.Log))
+		unaryInterceptors = append(unaryInterceptors, middleware.UnaryServerLoggingInterceptor(logger.Log))
 		//unaryClientInterceptors = append(unaryClientInterceptors, middleware.UnaryClientInterceptor(true))
 	}
 
