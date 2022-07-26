@@ -3,7 +3,7 @@ syntax = "proto3";
 
 option go_package = "./v1";
 
-import "google/protobuf/timestamp.proto";
+import "timestamp.proto";
 import "http.proto";
 
 // Tasks we have to do
